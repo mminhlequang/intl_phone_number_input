@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl_phone_number_input/src/models/country_model.dart';
-import 'package:intl_phone_number_input/src/widgets/input_widget.dart';
+
+import '../../intl_phone_number_input.dart';
+import '../models/country_model.dart';
 
 /// [CountryComparator] takes two countries: A and B.
 ///
@@ -9,15 +10,12 @@ typedef CountryComparator = int Function(Country, Country);
 
 /// [SelectorConfig] contains selector button configurations
 class SelectorConfig {
+  final Widget Function(String)? flagbuilder;
+  final TextStyle? selectorTextStyle;
+  final Color? bgColor;
+
   /// [selectorType], for selector button type
   final PhoneInputSelectorType selectorType;
-
-  /// [showFlags], displays flag along side countries info on selector button
-  /// and list items within the selector
-  final bool showFlags;
-
-  /// [useEmoji], uses emoji flags instead of png assets
-  final bool useEmoji;
 
   /// [countryComparator], sort the country list according to the comparator.
   ///
@@ -33,17 +31,13 @@ class SelectorConfig {
   /// Add white space for short dial code
   final bool trailingSpace;
 
-  /// Use safe area for selectorType=BOTTOM_SHEET
-  final bool useBottomSheetSafeArea;
-
   const SelectorConfig({
+    this.flagbuilder,
+    this.selectorTextStyle,this.bgColor,
     this.selectorType = PhoneInputSelectorType.DROPDOWN,
-    this.showFlags = true,
-    this.useEmoji = false,
     this.countryComparator,
     this.setSelectorButtonAsPrefixIcon = false,
     this.leadingPadding,
     this.trailingSpace = true,
-    this.useBottomSheetSafeArea = false,
   });
 }

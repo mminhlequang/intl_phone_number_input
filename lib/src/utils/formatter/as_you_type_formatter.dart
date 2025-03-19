@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/services.dart';
-import 'package:intl_phone_number_input/src/utils/phone_number/phone_number_util.dart';
+
+import '../phone_number/phone_number_util.dart';
 
 typedef OnInputFormatted<T> = void Function(T value);
 
@@ -40,69 +39,61 @@ class AsYouTypeFormatter extends TextInputFormatter {
     if (newValueLength > 0 && newValueLength > oldValueLength) {
       String newValueText = newValue.text;
       String rawText = newValueText.replaceAll(separatorChars, '');
-
-      int rawCursorPosition = newValue.selection.end;
-
-      int digitsBeforeCursor = 0, digitsAfterCursor = 0;
-
-      if (rawCursorPosition > 0 && rawCursorPosition <= newValueText.length) {
-        final rawTextBeforeCursor = newValueText
-            .substring(0, rawCursorPosition)
-            .replaceAll(separatorChars, '');
-        final rawTextAfterCursor = newValueText
-            .substring(rawCursorPosition)
-            .replaceAll(separatorChars, '');
-
-        digitsBeforeCursor = rawTextBeforeCursor.length;
-        digitsAfterCursor = rawTextAfterCursor.length;
-      }
-
       String textToParse = dialCode + rawText;
+
+      final _ = newValueText
+          .substring(
+              oldValue.selection.start == -1 ? 0 : oldValue.selection.start,
+              newValue.selection.end == -1 ? 0 : newValue.selection.end)
+          .replaceAll(separatorChars, '');
 
       formatAsYouType(input: textToParse).then(
         (String? value) {
           String parsedText = parsePhoneNumber(value);
 
-          int newCursorPosition = 0;
+          int offset =
+              newValue.selection.end == -1 ? 0 : newValue.selection.end;
 
-          if (digitsBeforeCursor > 0 || digitsAfterCursor > 0) {
-            for (var i = 0; i < parsedText.length; i++) {
-              final startCursor = i;
+          if (separatorChars.hasMatch(parsedText)) {
+            String valueInInputIndex = parsedText[offset - 1];
 
-              if (allowedChars.hasMatch(parsedText[startCursor])) {
-                if (digitsBeforeCursor > 0) {
-                  digitsBeforeCursor--;
+            if (offset < parsedText.length) {
+              int offsetDifference = parsedText.length - offset;
+
+              if (offsetDifference < 2) {
+                if (separatorChars.hasMatch(valueInInputIndex)) {
+                  offset += 1;
                 } else {
-                  newCursorPosition = startCursor + 1;
-                  break;
+                  bool isLastChar;
+                  try {
+                    var _ = newValueText[newValue.selection.end];
+                    isLastChar = false;
+                  } on RangeError {
+                    isLastChar = true;
+                  }
+                  if (isLastChar) {
+                    offset += offsetDifference;
+                  }
                 }
-              }
-
-              final endCursor = parsedText.length - 1 - i;
-
-              if (allowedChars.hasMatch(parsedText[endCursor])) {
-                if (digitsAfterCursor > 0) {
-                  digitsAfterCursor--;
-                } else {
-                  newCursorPosition = endCursor + 1;
-                  break;
+              } else {
+                if (parsedText.length > offset - 1) {
+                  if (separatorChars.hasMatch(valueInInputIndex)) {
+                    offset += 1;
+                  }
                 }
               }
             }
+
+            onInputFormatted(
+              TextEditingValue(
+                text: parsedText,
+                selection: TextSelection.collapsed(offset: offset),
+              ),
+            );
           }
-
-          newCursorPosition = min(max(newCursorPosition, 0), parsedText.length);
-
-          this.onInputFormatted(
-            TextEditingValue(
-              text: parsedText,
-              selection: TextSelection.collapsed(offset: newCursorPosition),
-            ),
-          );
         },
       );
     }
-
     return newValue;
   }
 
@@ -121,15 +112,13 @@ class AsYouTypeFormatter extends TextInputFormatter {
   /// Accepts a formatted [phoneNumber]
   /// returns a [String] of `phoneNumber` with the dialCode replaced with an empty String
   String parsePhoneNumber(String? phoneNumber) {
-    final filteredPhoneNumber =
+    var filteredPhoneNumber =
         phoneNumber?.replaceAll(bracketsBetweenDigitsOrSpace, '');
 
     if (dialCode.length > 4) {
       if (isPartOfNorthAmericanNumberingPlan(dialCode)) {
         String northAmericaDialCode = '+1';
-        String countryDialCodeWithSpace = northAmericaDialCode +
-            ' ' +
-            dialCode.replaceFirst(northAmericaDialCode, '');
+        String countryDialCodeWithSpace = '$northAmericaDialCode ${dialCode.replaceFirst(northAmericaDialCode, '')}';
 
         return filteredPhoneNumber!
             .replaceFirst(countryDialCodeWithSpace, '')

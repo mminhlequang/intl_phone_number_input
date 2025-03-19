@@ -3,8 +3,9 @@ import 'dart:math';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:equatable/equatable.dart';
-import 'package:intl_phone_number_input/src/models/country_list.dart';
-import 'package:intl_phone_number_input/src/utils/phone_number/phone_number_util.dart';
+
+import '../models/country_list.dart';
+import 'phone_number/phone_number_util.dart'; 
 
 /// Type of phone numbers.
 enum PhoneNumberType {
@@ -51,7 +52,7 @@ class PhoneNumber extends Equatable {
 
   @override
   String toString() {
-    return 'PhoneNumber(phoneNumber: $phoneNumber, dialCode: $dialCode, isoCode: $isoCode)';
+    return phoneNumber!;
   }
 
   /// Returns [PhoneNumber] which contains region information about
@@ -93,13 +94,13 @@ class PhoneNumber extends Equatable {
         '',
       );
     } else {
-      throw new Exception('ISO Code is "${phoneNumber.isoCode}"');
+      throw Exception('ISO Code is "${phoneNumber.isoCode}"');
     }
   }
 
   /// Returns a String of [phoneNumber] without [dialCode]
   String parseNumber() {
-    return this.phoneNumber!.replaceAll("${this.dialCode}", '');
+    return phoneNumber!.replaceAll("$dialCode", '');
   }
 
   /// For predefined phone number returns Country's [isoCode] from the dial code,

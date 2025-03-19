@@ -1,9 +1,10 @@
-import 'package:dlibphonenumber/dlibphonenumber.dart' as p;
-import 'package:intl_phone_number_input/src/utils/phone_number.dart';
+import 'package:flutter_libphonenumber/flutter_libphonenumber.dart'
+    as FlutterLibphonenumber;
 
+import '../phone_number.dart';
+
+/// A wrapper class [PhoneNumberUtil] that basically switch between plugin available for `Web` or `Android or IOS` and `Other platforms` when available.
 class PhoneNumberUtil {
-  static p.PhoneNumberUtil phoneUtil = p.PhoneNumberUtil.instance;
-
   /// [isValidNumber] checks if a [phoneNumber] is valid.
   /// Accepts [phoneNumber] and [isoCode]
   /// Returns [Future<bool>].
@@ -12,8 +13,14 @@ class PhoneNumberUtil {
     if (phoneNumber.length < 2) {
       return false;
     }
-    final number = phoneUtil.parse(phoneNumber, isoCode.toUpperCase());
-    return phoneUtil.isValidNumber(number);
+
+    try {
+      // Phân tích số điện thoại để kiểm tra tính hợp lệ
+      await FlutterLibphonenumber.parse(phoneNumber, region: isoCode);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// [normalizePhoneNumber] normalizes a string of characters representing a phone number
@@ -21,34 +28,78 @@ class PhoneNumberUtil {
   /// Returns [Future<String>]
   static Future<String?> normalizePhoneNumber(
       {required String phoneNumber, required String isoCode}) async {
-    final number = phoneUtil.parse(phoneNumber, isoCode.toUpperCase());
-    return phoneUtil.format(number, p.PhoneNumberFormat.e164);
+    try {
+      // Lấy định dạng e164 của số điện thoại (đã chuẩn hóa)
+      final result =
+          await FlutterLibphonenumber.parse(phoneNumber, region: isoCode);
+      return result['e164'] as String?;
+    } catch (e) {
+      return phoneNumber;
+    }
   }
 
   /// Accepts [phoneNumber] and [isoCode]
   /// Returns [Future<RegionInfo>] of all information available about the [phoneNumber]
   static Future<RegionInfo> getRegionInfo(
       {required String phoneNumber, required String isoCode}) async {
-    final number = phoneUtil.parse(phoneNumber, isoCode.toUpperCase());
-    final regionCode = phoneUtil.getRegionCodeForNumber(number);
-    final countryCode = number.countryCode.toString();
-    final formattedNumber =
-        phoneUtil.format(number, p.PhoneNumberFormat.national);
-    return RegionInfo(
-      regionPrefix: countryCode,
-      isoCode: regionCode,
-      formattedPhoneNumber: formattedNumber,
-    );
+    try {
+      final result =
+          await FlutterLibphonenumber.parse(phoneNumber, region: isoCode);
+
+      return RegionInfo(
+        regionPrefix: '+${result['country_code']}',
+        isoCode: result['region_code'],
+        formattedPhoneNumber: result['national'],
+      );
+    } catch (e) {
+      // Trả về thông tin mặc định nếu có lỗi
+      return RegionInfo(
+        regionPrefix: '',
+        isoCode: isoCode,
+        formattedPhoneNumber: phoneNumber,
+      );
+    }
   }
 
   /// Accepts [phoneNumber] and [isoCode]
   /// Returns [Future<PhoneNumberType>] type of phone number
   static Future<PhoneNumberType> getNumberType(
       {required String phoneNumber, required String isoCode}) async {
-    final p.PhoneNumberType type = phoneUtil
-        .getNumberType(phoneUtil.parse(phoneNumber, isoCode.toUpperCase()));
+    try {
+      final result =
+          await FlutterLibphonenumber.parse(phoneNumber, region: isoCode);
+      final type = result['type'] as String?;
 
-    return PhoneNumberTypeUtil.getType(type.index);
+      // Chuyển đổi loại từ chuỗi sang PhoneNumberType
+      switch (type) {
+        case 'mobile':
+          return PhoneNumberType.MOBILE;
+        case 'fixed_line':
+          return PhoneNumberType.FIXED_LINE;
+        case 'fixed_line_or_mobile':
+          return PhoneNumberType.FIXED_LINE_OR_MOBILE;
+        case 'toll_free':
+          return PhoneNumberType.TOLL_FREE;
+        case 'premium_rate':
+          return PhoneNumberType.PREMIUM_RATE;
+        case 'shared_cost':
+          return PhoneNumberType.SHARED_COST;
+        case 'voip':
+          return PhoneNumberType.VOIP;
+        case 'personal_number':
+          return PhoneNumberType.PERSONAL_NUMBER;
+        case 'pager':
+          return PhoneNumberType.PAGER;
+        case 'uan':
+          return PhoneNumberType.UAN;
+        case 'voicemail':
+          return PhoneNumberType.VOICEMAIL;
+        default:
+          return PhoneNumberType.UNKNOWN;
+      }
+    } catch (e) {
+      return PhoneNumberType.UNKNOWN;
+    }
   }
 
   /// [formatAsYouType] uses Google's libphonenumber input format as you type.
@@ -56,12 +107,12 @@ class PhoneNumberUtil {
   /// Returns [Future<String>]
   static Future<String?> formatAsYouType(
       {required String phoneNumber, required String isoCode}) async {
-    final asYouTypeFormatter = phoneUtil.getAsYouTypeFormatter(isoCode);
-    String? result;
-    for (int i = 0; i < phoneNumber.length; i++) {
-      result = asYouTypeFormatter.inputDigit(phoneNumber[i]);
+    try {
+      final result = await FlutterLibphonenumber.format(phoneNumber, isoCode);
+      return result['formatted'];
+    } catch (e) {
+      return phoneNumber;
     }
-    return result;
   }
 }
 
@@ -83,10 +134,10 @@ class RegionInfo {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['regionCode'] = this.regionPrefix;
-    data['isoCode'] = this.isoCode;
-    data['formattedPhoneNumber'] = this.formattedPhoneNumber;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['regionCode'] = regionPrefix;
+    data['isoCode'] = isoCode;
+    data['formattedPhoneNumber'] = formattedPhoneNumber;
     return data;
   }
 
@@ -150,7 +201,7 @@ extension phonenumbertypeproperties on PhoneNumberType {
         return 6;
       case PhoneNumberType.PERSONAL_NUMBER:
         return 7;
-      case PhoneNumberType.PAGER:
+      case PhoneNumberType.PREMIUM_RATE:
         return 8;
       case PhoneNumberType.UAN:
         return 9;

@@ -13,6 +13,7 @@ dependencies:
   dlibphonenumber: ^1.1.17
   equatable: ^2.0.5
   collection: ^1.18.0
+  flutter_libphonenumber: ^2.5.1
 
 dev_dependencies:
   flutter_test:
@@ -25,4 +26,3 @@ dev_dependencies:
 # The following section is specific to Flutter.
 flutter:
   assets:
-    - assets/flags/
