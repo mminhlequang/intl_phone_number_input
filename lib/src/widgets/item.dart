@@ -1,11 +1,11 @@
- 
 import 'package:flutter/material.dart';
+import 'package:dash_flags/dash_flags.dart' as dash_flags;
 
 import '../models/country_model.dart';
 
 /// [Item]
 class Item extends StatelessWidget {
-  final Widget Function(String)? builder;
+  final Widget Function(String)? flagbuilder;
   final Country? country;
   final TextStyle? textStyle;
   final double? leadingPadding;
@@ -13,7 +13,7 @@ class Item extends StatelessWidget {
 
   const Item({
     Key? key,
-    this.builder,
+    this.flagbuilder,
     this.country,
     this.textStyle,
     this.leadingPadding = 12,
@@ -31,10 +31,14 @@ class Item extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         SizedBox(width: leadingPadding),
-        _Flag(
-          builder: builder,
-          country: country,
-        ),
+        if (country != null)
+          flagbuilder != null
+              ? flagbuilder!(country!.alpha2Code!)
+              : dash_flags.CountryFlag(
+                  country: dash_flags.Country.fromCode(
+                      country!.alpha2Code!.toLowerCase()),
+                  height: 20,
+                ),
         SizedBox(width: leadingPadding),
         Text(
           dialCode,
@@ -43,21 +47,5 @@ class Item extends StatelessWidget {
         ),
       ],
     );
-  }
-}
-
-class _Flag extends StatelessWidget {
-  final Widget Function(String)? builder;
-  final Country? country;
-
-  const _Flag({Key? key, this.builder, this.country}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return country != null
-        ? builder != null
-            ? builder!(country!.alpha2Code!)
-            : const SizedBox.shrink()
-        : const SizedBox.shrink();
   }
 }

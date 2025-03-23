@@ -10,10 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-  dlibphonenumber: ^1.1.17
-  equatable: ^2.0.5
-  collection: ^1.18.0
-  flutter_libphonenumber: ^2.5.1
+  dlibphonenumber: ">=1.1.17"
+  equatable: ">=2.0.5"
+  collection: ">=1.18.0"
+  flutter_libphonenumber: ">=2.5.1"
+  dash_flags: ">=0.1.1"
 
 dev_dependencies:
   flutter_test:

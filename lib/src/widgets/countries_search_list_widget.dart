@@ -1,3 +1,4 @@
+import 'package:dash_flags/dash_flags.dart' as dash_flags;
 import 'package:flutter/material.dart';
 
 import '../models/country_model.dart';
@@ -197,7 +198,11 @@ class _Flag extends StatelessWidget {
                 : country?.alpha2Code != null
                     ? builder != null
                         ? builder!(country!.alpha2Code!)
-                        : const SizedBox.shrink()
+                        : dash_flags.CountryFlag(
+                            country: dash_flags.Country.fromCode(
+                                country!.alpha2Code!.toLowerCase()),
+                            height: 20,
+                          )
                     : const SizedBox.shrink(),
           )
         : const SizedBox.shrink();

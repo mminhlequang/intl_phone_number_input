@@ -48,7 +48,7 @@ class SelectorButton extends StatelessWidget {
                   ),
                   hint: Item(
                     country: country,
-                    builder: selectorConfig.flagbuilder,
+                    flagbuilder: selectorConfig.flagbuilder,
                     leadingPadding: selectorConfig.leadingPadding,
                     trailingSpace: selectorConfig.trailingSpace,
                     textStyle: selectorConfig.selectorTextStyle,
@@ -61,7 +61,7 @@ class SelectorButton extends StatelessWidget {
               )
             : Item(
                 country: country,
-                builder: selectorConfig.flagbuilder,
+                flagbuilder: selectorConfig.flagbuilder,
                 leadingPadding: selectorConfig.leadingPadding,
                 trailingSpace: selectorConfig.trailingSpace,
                 textStyle: selectorConfig.selectorTextStyle,
@@ -90,7 +90,7 @@ class SelectorButton extends StatelessWidget {
               padding: const EdgeInsets.only(right: 8.0),
               child: Item(
                 country: country,
-                builder: selectorConfig.flagbuilder,
+                flagbuilder: selectorConfig.flagbuilder,
                 leadingPadding: selectorConfig.leadingPadding,
                 trailingSpace: selectorConfig.trailingSpace,
                 textStyle: selectorConfig.selectorTextStyle,
@@ -105,11 +105,15 @@ class SelectorButton extends StatelessWidget {
     return countries.map((country) {
       return DropdownMenuItem<Country>(
         value: country,
-        child: Item(
-          country: country,
-          builder: selectorConfig.flagbuilder,
-          textStyle: selectorConfig.selectorTextStyle,
-          trailingSpace: selectorConfig.trailingSpace,
+        child: Container(
+          color: selectorConfig.itemBackgroundColor,
+          padding: EdgeInsets.symmetric(vertical: 4.0),
+          child: Item(
+            country: country,
+            flagbuilder: selectorConfig.flagbuilder,
+            textStyle: selectorConfig.selectorTextStyle,
+            trailingSpace: selectorConfig.trailingSpace,
+          ),
         ),
       );
     }).toList();

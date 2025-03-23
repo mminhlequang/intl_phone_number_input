@@ -13,6 +13,7 @@ class SelectorConfig {
   final Widget Function(String)? flagbuilder;
   final TextStyle? selectorTextStyle;
   final Color? bgColor;
+  final Color? itemBackgroundColor;
 
   /// [selectorType], for selector button type
   final PhoneInputSelectorType selectorType;
@@ -33,7 +34,9 @@ class SelectorConfig {
 
   const SelectorConfig({
     this.flagbuilder,
-    this.selectorTextStyle,this.bgColor,
+    this.selectorTextStyle,
+    this.bgColor,
+    this.itemBackgroundColor,
     this.selectorType = PhoneInputSelectorType.DROPDOWN,
     this.countryComparator,
     this.setSelectorButtonAsPrefixIcon = false,
