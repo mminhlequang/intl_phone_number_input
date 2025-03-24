@@ -105,8 +105,7 @@ class SelectorButton extends StatelessWidget {
     return countries.map((country) {
       return DropdownMenuItem<Country>(
         value: country,
-        child: Container(
-          color: selectorConfig.itemBackgroundColor,
+        child: Padding(
           padding: EdgeInsets.symmetric(vertical: 4.0),
           child: Item(
             country: country,
