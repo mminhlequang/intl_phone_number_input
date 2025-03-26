@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../intl_phone_number_input.dart';
 import '../models/country_model.dart';
-import 'countries_search_list_widget.dart';
 import 'item.dart';
 
 /// [SelectorButton]
@@ -124,21 +123,8 @@ class SelectorButton extends StatelessWidget {
     return showDialog(
       context: inheritedContext,
       barrierDismissible: true,
-      builder: (BuildContext context) => AlertDialog(
-        content: Directionality(
-          textDirection: Directionality.of(inheritedContext),
-          child: SizedBox(
-            width: double.maxFinite,
-            child: CountrySearchListWidget(
-              countries,
-              locale,
-              searchBoxDecoration: searchBoxDecoration,
-              autoFocus: autoFocusSearchField,
-              builderFlag: selectorConfig.flagbuilder,
-            ),
-          ),
-        ),
-      ),
+      builder: (BuildContext context) =>
+          selectorConfig.dialogSearchBuilder!(countries),
     );
   }
 
@@ -150,45 +136,8 @@ class SelectorButton extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       isScrollControlled: isScrollControlled,
       backgroundColor: Colors.transparent,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12), topRight: Radius.circular(12))),
       builder: (BuildContext context) {
-        return Stack(children: [
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: DraggableScrollableSheet(
-              builder: (BuildContext context, ScrollController controller) {
-                return Directionality(
-                  textDirection: Directionality.of(inheritedContext),
-                  child: Container(
-                    decoration: ShapeDecoration(
-                      color: Theme.of(context).canvasColor,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          topRight: Radius.circular(12),
-                        ),
-                      ),
-                    ),
-                    child: CountrySearchListWidget(
-                      countries,
-                      locale,
-                      searchBoxDecoration: searchBoxDecoration,
-                      scrollController: controller,
-                      autoFocus: autoFocusSearchField,
-                      builderFlag: selectorConfig.flagbuilder,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ]);
+        return selectorConfig.bottomSheetBuilder!(countries);
       },
     );
   }

@@ -10,8 +10,13 @@ typedef CountryComparator = int Function(Country, Country);
 
 /// [SelectorConfig] contains selector button configurations
 class SelectorConfig {
+  /// [flagbuilder], builds a widget for the flag
   final Widget Function(String)? flagbuilder;
+
+  /// [selectorTextStyle], style for the selector text
   final TextStyle? selectorTextStyle;
+
+  /// [bgColor], background color for the selector
   final Color? bgColor;
 
   /// [selectorType], for selector button type
@@ -31,6 +36,10 @@ class SelectorConfig {
   /// Add white space for short dial code
   final bool trailingSpace;
 
+  /// [dialogBuilder], builds a dialog for the selector
+  final Widget Function(List<Country>)? dialogSearchBuilder;
+  final Widget Function(List<Country>)? bottomSheetBuilder;
+
   const SelectorConfig({
     this.flagbuilder,
     this.selectorTextStyle,
@@ -40,5 +49,7 @@ class SelectorConfig {
     this.setSelectorButtonAsPrefixIcon = false,
     this.leadingPadding,
     this.trailingSpace = true,
+    this.dialogSearchBuilder,
+    this.bottomSheetBuilder,
   });
 }
