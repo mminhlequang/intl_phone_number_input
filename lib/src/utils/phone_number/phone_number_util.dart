@@ -63,6 +63,49 @@ class PhoneNumberUtil {
     }
     return result;
   }
+
+  /// [getPhoneNumberFromString] parses a full phone number string (including country code)
+  /// like "+84979797979" and returns a [PhoneNumber] object with all details.
+  ///
+  /// Accepts full [phoneNumber] string with country code (e.g. "+84979797979")
+  /// Returns [Future<PhoneNumber>] with parsed details
+  static Future<PhoneNumber?> getPhoneNumberFromString(
+      String phoneNumber) async {
+    PhoneNumber? result;
+
+    // Phân tích số điện thoại với mã quốc gia
+    try {
+      if (phoneNumber.isEmpty) {
+        throw Exception('Phone number cannot be empty');
+      }
+      // Parse phone number without country hint
+      final number = phoneUtil.parse(phoneNumber, '');
+
+      // Get region code (ISO)
+      final regionCode = phoneUtil.getRegionCodeForNumber(number);
+
+      if (regionCode == null || regionCode.isEmpty) {
+        throw Exception('Cannot determine region code for $phoneNumber');
+      }
+
+      // Get country calling code (e.g., +84)
+      final countryCode = '+${number.countryCode.toString()}';
+
+      // Format as E164 for consistent format
+      final formattedNumber =
+          phoneUtil.format(number, p.PhoneNumberFormat.e164);
+
+      // Create PhoneNumber object
+      result = PhoneNumber(
+        phoneNumber: formattedNumber,
+        isoCode: regionCode,
+        dialCode: countryCode,
+      );
+    } catch (e) {
+      print('Error parsing phone number: $e');
+    }
+    return result;
+  }
 }
 
 /// [RegionInfo] contains regional information about a phone number.

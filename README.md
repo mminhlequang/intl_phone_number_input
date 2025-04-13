@@ -45,6 +45,48 @@ A simple and customizable flutter package for inputting phone number in intl / i
 
 > isoCode could be null if PhoneNumber is not recognised
 
+# Initial Value Example
+
+### Using a full phone number string (e.g. "+84979797979")
+```dart
+// Cách 1: Sử dụng phương thức PhoneNumber.fromRawString để tạo đối tượng từ số điện thoại đầy đủ
+Future<void> initPhoneNumber() async {
+  // Tạo đối tượng PhoneNumber từ chuỗi số điện thoại đầy đủ
+  PhoneNumber initialPhoneNumber = await PhoneNumber.fromRawString("+84979797979");
+  
+  // Sử dụng trong widget
+  return InternationalPhoneNumberInput(
+    initialValue: initialPhoneNumber,
+    onInputChanged: (PhoneNumber number) {
+      print(number.phoneNumber);
+    },
+  );
+}
+
+// Cách 2: Sử dụng phương thức PhoneNumber.getRegionInfoFromPhoneNumber với mã quốc gia
+Future<void> initPhoneNumber() async {
+  // Lấy thông tin khu vực từ số điện thoại
+  PhoneNumber number = await PhoneNumber.getRegionInfoFromPhoneNumber("+84979797979", "VN");
+  
+  // Sử dụng trong widget
+  return InternationalPhoneNumberInput(
+    initialValue: number,
+    onInputChanged: (PhoneNumber number) {
+      print(number.phoneNumber);
+    },
+  );
+}
+
+// Cách 3: Tạo trực tiếp đối tượng PhoneNumber - cần biết chính xác thông tin
+PhoneNumber createPhoneNumber() {
+  return PhoneNumber(
+    phoneNumber: "+84979797979",
+    isoCode: "VN", // Mã ISO của Việt Nam
+    dialCode: "+84" // Mã quốc tế của Việt Nam
+  );
+}
+```
+
 # Usage
 
 ### Constructors

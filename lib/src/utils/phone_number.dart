@@ -54,6 +54,20 @@ class PhoneNumber extends Equatable {
     return 'PhoneNumber(phoneNumber: $phoneNumber, dialCode: $dialCode, isoCode: $isoCode)';
   }
 
+  /// Creates a [PhoneNumber] object from a full phone number string
+  /// like "+84979797979"
+  ///
+  /// This is useful for quickly creating a PhoneNumber object from a string
+  /// for use with initialValue in InternationalPhoneNumberInput.
+  ///
+  /// Example:
+  /// ```dart
+  /// final phoneNumber = await PhoneNumber.fromRawString("+84979797979");
+  /// ```
+  static Future<PhoneNumber?> fromRawString(String phoneNumber) async {
+    return await PhoneNumberUtil.getPhoneNumberFromString(phoneNumber);
+  }
+
   /// Returns [PhoneNumber] which contains region information about
   /// the [phoneNumber] and [isoCode] passed.
   static Future<PhoneNumber> getRegionInfoFromPhoneNumber(
